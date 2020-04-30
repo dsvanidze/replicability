@@ -10,6 +10,7 @@ pandas = "*"
 pip-autoremove = "*"
 matplotlib = "*"
 pipdeptree = "*"
+rasterio = "*"
 
 [requires]
 python_version = "3.7"
