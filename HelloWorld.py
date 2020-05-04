@@ -7,5 +7,22 @@ import pandas as pd
 x = np.linspace(0, 20, 100)
 plt.plot(x, np.sin(x))       # Plot the sine of each x point
 plt.show()                   # Display the plot
+plt.Annotation
 
+
+a = None
 print("Hello World")
+
+
+def hallo(asdad):
+    y = 20
+    return "hallo"
+
+
+class Asdadad():
+    if __name__ == "__main__":
+        pass
+
+
+class classname(object):
+    pass
