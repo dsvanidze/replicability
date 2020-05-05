@@ -1,6 +1,6 @@
 {
   "python.pythonPath": ".venv/bin/python",
-  "python.jediEnabled": false,
+  "python.jediEnabled": true,
   "python.linting.enabled": true,
   "C_Cpp.enhancedColorization": "Enabled",
   "workbench.colorTheme": "Chromodynamics",
