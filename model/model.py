@@ -1,10 +1,12 @@
 import matplotlib.pyplot as plt
 from keras.callbacks import EarlyStopping
-from keras.layers import Dense, BatchNormalization, Dropout
+from keras.layers import Dense, BatchNormalization, Dropout, Activation
 from keras.models import Sequential
-from keras.optimizers import Adam
+from keras import optimizers
+from keras import metrics
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 from reproduce import reproduce
 import numpy as np
 
@@ -13,6 +15,18 @@ reproduce(0)
 
 # read in data using pandas
 data = pd.read_csv("data/csvs/cleandata_model.csv")
+
+data["longxlat"] = data["longitude"] * data["latitude"]
+# data.drop(columns=["raster_value", "longitude", "latitude"])
+# data = data.drop(columns=["raster_value"])
+
+scaler = StandardScaler()
+data[data.columns] = scaler.fit_transform(data[data.columns])
+# data["longitude"] = scaler.fit_transform(data[["longitude"]])
+# data["latitude"] = scaler.fit_transform(data[["latitude"]])
+# data["raster_value"] = scaler.fit_transform(data[["raster_value"]])
+# data["longxlat"] = scaler.fit_transform(data[["longxlat"]])
+
 
 # data = data.groupby(["longitude", "latitude"], as_index=False).agg(
 #     "mean").drop(columns=["Org.ID"])
@@ -44,41 +58,46 @@ model = Sequential()
 n_cols = X_train.shape[1]
 
 # add model layers
-model.add(Dense(20, activation="relu", input_shape=(n_cols,)))
-model.add(BatchNormalization())
+model.add(Dense(10, input_shape=(n_cols,)))
 model.add(Dropout(0.2))
-model.add(Dense(12, activation="relu"))
 model.add(BatchNormalization())
-model.add(Dropout(0.2))
-model.add(Dense(12, activation="relu"))
-model.add(BatchNormalization())
-model.add(Dropout(0.2))
-model.add(Dense(8, activation="relu"))
-model.add(BatchNormalization())
-model.add(Dropout(0.2))
-model.add(Dense(8, activation="relu"))
-model.add(BatchNormalization())
-model.add(Dropout(0.2))
-model.add(Dense(4, activation="relu"))
-model.add(BatchNormalization())
-model.add(Dense(1, activation="relu"))
+model.add(Activation("relu"))
 
-optimizer = Adam(learning_rate=0.000001)
+model.add(Dense(5))
+model.add(Dropout(0.2))
+model.add(BatchNormalization())
+model.add(Activation("relu"))
+
+model.add(Dense(3))
+model.add(Dropout(0.2))
+model.add(BatchNormalization())
+model.add(Activation("relu"))
+
+model.add(Dense(1))
+model.add(BatchNormalization())
+model.add(Activation("linear"))
+
+optimizer = optimizers.Adam(learning_rate=0.0001)
 
 # compile model using mse as a measure of model performance
 model.compile(optimizer=optimizer, loss="mean_squared_error",
-              metrics=['accuracy'])
+              metrics=["mean_squared_error"])
 
 
 # set early stopping monitor so the model stops training when it won"t improve anymore
-early_stopping_monitor = EarlyStopping(patience=200)
+# early_stopping_monitor = EarlyStopping(patience=100000)
 # train model
-history = model.fit(X_train, Y_train, validation_split=0.2,
-                    epochs=10000, callbacks=[early_stopping_monitor])
+history = model.fit(X_train, Y_train, batch_size=512, validation_split=0.2,
+                    epochs=40000, callbacks=[])
 
 # example on how to use our newly trained model on how to make predictions on unseen data (we will pretend our new data is saved in a dataframe called "X_test").
-# Y_test_predictions = model.predict(X_test)
-# print(Y_test_predictions)
+Y_test_predictions = model.predict(X_test)
+print(Y_test_predictions)
+
+results = model.evaluate(X_test, Y_test, batch_size=512)
+print(results)
+# print('test loss, test acc:', results)
+# scaler.inverse_transform([0, 0, Y_test_predictions, 0, 0])
 
 # Plot training & validation accuracy values
 plt.plot(history.history['accuracy'])
@@ -91,9 +110,9 @@ plt.show()
 
 # Plot training & validation loss values
 plt.plot(history.history['loss'])
-plt.plot(history.history['val_loss'])
+# plt.plot(history.history['val_loss'])
 plt.title('Model loss')
 plt.ylabel('Loss')
 plt.xlabel('Epoch')
-plt.legend(['Train', 'Test'], loc='upper left')
+# plt.legend(['Train', 'Test'], loc='upper left')
 plt.show()
