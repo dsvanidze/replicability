@@ -87,6 +87,13 @@ model.add(Dropout(0.2))
 model.add(BatchNormalization())
 model.add(Activation("relu"))
 
+model.add(Dense(8,
+                kernel_initializer='he_normal',
+                bias_initializer='zeros'))
+model.add(Dropout(0.2))
+model.add(BatchNormalization())
+model.add(Activation("relu"))
+
 model.add(Dense(1,
                 kernel_initializer='he_normal',
                 bias_initializer='zeros'))
@@ -107,7 +114,7 @@ history = model.fit(X_train, Y_train, batch_size=512, validation_split=0.2,
 
 # example on how to use our newly trained model on how to make predictions on unseen data (we will pretend our new data is saved in a dataframe called "X_test").
 Y_test_predictions = model.predict(X_test)
-print(Y_test_predictions)
+# print(Y_test_predictions)
 
 newdata = pd.DataFrame(data={"longitude": X_test["longitude"],
                              "latitude": X_test["latitude"],
@@ -115,7 +122,7 @@ newdata = pd.DataFrame(data={"longitude": X_test["longitude"],
                              "raster_value": X_test["raster_value"],
                              "longxlat": X_test["longxlat"]})
 
-print(scaler.inverse_transform(newdata))
+# print(scaler.inverse_transform(newdata))
 
 print("INVERSED: ", scaler.inverse_transform([0, 0, Y_test_predictions, 0, 0]))
 
