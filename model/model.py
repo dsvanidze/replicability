@@ -93,7 +93,7 @@ model.add(Dense(1,
 model.add(BatchNormalization())
 model.add(Activation("linear"))
 
-optimizer = optimizers.Adam(learning_rate=0.0009)
+optimizer = optimizers.Adam(learning_rate=0.000005)
 
 # compile model using mse as a measure of model performance
 model.compile(optimizer=optimizer, loss="mean_squared_error")
