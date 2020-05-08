@@ -58,7 +58,7 @@ model = Sequential()
 n_cols = X_train.shape[1]
 
 # add model layers
-model.add(Dense(10,
+model.add(Dense(20,
                 kernel_initializer='he_normal',
                 bias_initializer='zeros',
                 input_shape=(n_cols,)))
@@ -66,7 +66,14 @@ model.add(Dropout(0.2))
 model.add(BatchNormalization())
 model.add(Activation("relu"))
 
-model.add(Dense(8,
+model.add(Dense(20,
+                kernel_initializer='he_normal',
+                bias_initializer='zeros'))
+model.add(Dropout(0.2))
+model.add(BatchNormalization())
+model.add(Activation("relu"))
+
+model.add(Dense(16,
                 kernel_initializer='he_normal',
                 bias_initializer='zeros'))
 model.add(Dropout(0.2))
@@ -74,13 +81,6 @@ model.add(BatchNormalization())
 model.add(Activation("relu"))
 
 model.add(Dense(8,
-                kernel_initializer='he_normal',
-                bias_initializer='zeros'))
-model.add(Dropout(0.2))
-model.add(BatchNormalization())
-model.add(Activation("relu"))
-
-model.add(Dense(4,
                 kernel_initializer='he_normal',
                 bias_initializer='zeros'))
 model.add(Dropout(0.2))
@@ -93,17 +93,17 @@ model.add(Dense(1,
 model.add(BatchNormalization())
 model.add(Activation("linear"))
 
-optimizer = optimizers.Adam(learning_rate=0.000005)
+optimizer = optimizers.Adam(learning_rate=0.0005)
 
 # compile model using mse as a measure of model performance
 model.compile(optimizer=optimizer, loss="mean_squared_error")
 
 
 # set early stopping monitor so the model stops training when it won"t improve anymore
-# early_stopping_monitor = EarlyStopping(patience=5000)
+early_stopping_monitor = EarlyStopping(patience=5000)
 # train model
 history = model.fit(X_train, Y_train, batch_size=512, validation_split=0.2,
-                    epochs=1000000, verbose=2)
+                    epochs=100000, verbose=2, callbacks=[early_stopping_monitor])
 
 # example on how to use our newly trained model on how to make predictions on unseen data (we will pretend our new data is saved in a dataframe called "X_test").
 Y_test_predictions = model.predict(X_test)
@@ -117,9 +117,10 @@ newdata = pd.DataFrame(data={"longitude": X_test["longitude"],
 
 print(scaler.inverse_transform(newdata))
 
+print("INVERSED: ", scaler.inverse_transform([0, 0, Y_test_predictions, 0, 0]))
+
 results = model.evaluate(X_test, Y_test, batch_size=512)
 print(results)
-print("INVERSED: ", scaler.inverse_transform([0, 0, Y_test_predictions, 0, 0]))
 
 # # Plot training & validation accuracy values
 # plt.plot(history.history['accuracy'])
