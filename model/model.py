@@ -58,59 +58,88 @@ model = Sequential()
 n_cols = X_train.shape[1]
 
 # add model layers
-model.add(Dense(10, input_shape=(n_cols,)))
+model.add(Dense(10,
+                kernel_initializer='he_normal',
+                bias_initializer='zeros',
+                input_shape=(n_cols,)))
 model.add(Dropout(0.2))
 model.add(BatchNormalization())
 model.add(Activation("relu"))
 
-model.add(Dense(5))
+model.add(Dense(8,
+                kernel_initializer='he_normal',
+                bias_initializer='zeros'))
 model.add(Dropout(0.2))
 model.add(BatchNormalization())
 model.add(Activation("relu"))
 
-model.add(Dense(3))
+model.add(Dense(8,
+                kernel_initializer='he_normal',
+                bias_initializer='zeros'))
 model.add(Dropout(0.2))
 model.add(BatchNormalization())
 model.add(Activation("relu"))
 
-model.add(Dense(1))
+model.add(Dense(4,
+                kernel_initializer='he_normal',
+                bias_initializer='zeros'))
+model.add(Dropout(0.2))
+model.add(BatchNormalization())
+model.add(Activation("relu"))
+
+model.add(Dense(1,
+                kernel_initializer='he_normal',
+                bias_initializer='zeros'))
 model.add(BatchNormalization())
 model.add(Activation("linear"))
 
-optimizer = optimizers.Adam(learning_rate=0.0001)
+optimizer = optimizers.Adam(learning_rate=0.0009)
 
 # compile model using mse as a measure of model performance
-model.compile(optimizer=optimizer, loss="mean_squared_error",
-              metrics=["mean_squared_error"])
+model.compile(optimizer=optimizer, loss="mean_squared_error")
 
 
 # set early stopping monitor so the model stops training when it won"t improve anymore
-# early_stopping_monitor = EarlyStopping(patience=100000)
+# early_stopping_monitor = EarlyStopping(patience=5000)
 # train model
 history = model.fit(X_train, Y_train, batch_size=512, validation_split=0.2,
-                    epochs=40000, callbacks=[])
+                    epochs=10000, verbose=2)
 
 # example on how to use our newly trained model on how to make predictions on unseen data (we will pretend our new data is saved in a dataframe called "X_test").
 Y_test_predictions = model.predict(X_test)
 print(Y_test_predictions)
 
+newdata = pd.DataFrame(data={"longitude": X_test["longitude"],
+                             "latitude": X_test["latitude"],
+                             "cases": np.squeeze(Y_test_predictions),
+                             "raster_value": X_test["raster_value"],
+                             "longxlat": X_test["longxlat"]})
+
+print(scaler.inverse_transform(newdata))
+
 results = model.evaluate(X_test, Y_test, batch_size=512)
 print(results)
-# print('test loss, test acc:', results)
-# scaler.inverse_transform([0, 0, Y_test_predictions, 0, 0])
+print("INVERSED: ", scaler.inverse_transform([0, 0, Y_test_predictions, 0, 0]))
 
-# Plot training & validation accuracy values
-plt.plot(history.history['accuracy'])
-plt.plot(history.history['val_accuracy'])
-plt.title('Model accuracy')
-plt.ylabel('Accuracy')
-plt.xlabel('Epoch')
-plt.legend(['Train', 'Test'], loc='upper left')
-plt.show()
+# # Plot training & validation accuracy values
+# plt.plot(history.history['accuracy'])
+# plt.plot(history.history['val_accuracy'])
+# plt.title('Model accuracy')
+# plt.ylabel('Accuracy')
+# plt.xlabel('Epoch')
+# plt.legend(['Train', 'Test'], loc='upper left')
+# plt.show()
 
 # Plot training & validation loss values
-plt.plot(history.history['loss'])
+plt.plot(history.history['loss'][::100])
 # plt.plot(history.history['val_loss'])
+plt.title('Model loss')
+plt.ylabel('Loss')
+plt.xlabel('Epoch')
+# plt.legend(['Train', 'Test'], loc='upper left')
+plt.show()
+
+plt.plot(history.history['val_loss'][::100])
 plt.title('Model loss')
 plt.ylabel('Loss')
 plt.xlabel('Epoch')
