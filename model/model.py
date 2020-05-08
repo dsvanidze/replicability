@@ -103,7 +103,7 @@ model.compile(optimizer=optimizer, loss="mean_squared_error")
 # early_stopping_monitor = EarlyStopping(patience=5000)
 # train model
 history = model.fit(X_train, Y_train, batch_size=512, validation_split=0.2,
-                    epochs=10000, verbose=2)
+                    epochs=1000000, verbose=2)
 
 # example on how to use our newly trained model on how to make predictions on unseen data (we will pretend our new data is saved in a dataframe called "X_test").
 Y_test_predictions = model.predict(X_test)
