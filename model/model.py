@@ -14,41 +14,19 @@ import numpy as np
 reproduce(0)
 
 # read in data using pandas
-data = pd.read_csv("data/csvs/cleandata_model.csv")
-
-data["longxlat"] = data["longitude"] * data["latitude"]
-# data.drop(columns=["raster_value", "longitude", "latitude"])
-# data = data.drop(columns=["raster_value"])
+data = pd.read_csv("data/csvs/cleandata-basic-model.csv")
 
 scaler = StandardScaler()
 data[data.columns] = scaler.fit_transform(data[data.columns])
-# data["longitude"] = scaler.fit_transform(data[["longitude"]])
-# data["latitude"] = scaler.fit_transform(data[["latitude"]])
-# data["raster_value"] = scaler.fit_transform(data[["raster_value"]])
-# data["longxlat"] = scaler.fit_transform(data[["longxlat"]])
-
-
-# data = data.groupby(["longitude", "latitude"], as_index=False).agg(
-#     "mean").drop(columns=["Org.ID"])
-
-
-# data.to_csv("data/csvs/cleandata_model.csv", index=False)
 print(data.head())
 
 # create a dataframe with all training data except the target column
 X = data.drop(columns=["cases"])
 
-# check that the target variable has been removed
-# print(X_train.head())
-
 # create a dataframe with only the target column
 Y = data[["cases"]]
 
-# view dataframe
-# print(Y_train.head())
-
 # check data has been read in properly
-# print(train_df.head())
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
 
 # create model
@@ -119,24 +97,18 @@ Y_test_predictions = model.predict(X_test)
 newdata = pd.DataFrame(data={"longitude": X_test["longitude"],
                              "latitude": X_test["latitude"],
                              "cases": np.squeeze(Y_test_predictions),
-                             "raster_value": X_test["raster_value"],
+                             "access": X_test["access"],
                              "longxlat": X_test["longxlat"]})
 
-# print(scaler.inverse_transform(newdata))
-
-print("INVERSED: ", scaler.inverse_transform([0, 0, Y_test_predictions, 0, 0]))
+print("INVERSED: ", np.squeeze(scaler.inverse_transform(
+    [0, 0, Y_test_predictions, 0, 0])[2]))
 
 results = model.evaluate(X_test, Y_test, batch_size=512)
 print(results)
 
-# # Plot training & validation accuracy values
-# plt.plot(history.history['accuracy'])
-# plt.plot(history.history['val_accuracy'])
-# plt.title('Model accuracy')
-# plt.ylabel('Accuracy')
-# plt.xlabel('Epoch')
-# plt.legend(['Train', 'Test'], loc='upper left')
-# plt.show()
+model.save("models-collection/basic-model.h5")
+print("Saved model to disk")
+
 
 # Plot training & validation loss values
 plt.plot(history.history['loss'][::100])
