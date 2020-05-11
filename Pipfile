@@ -13,6 +13,10 @@ pip-autoremove = "*"
 matplotlib = "*"
 pipdeptree = "*"
 rasterio = "*"
+keras = "*"
+tensorflow = "*"
+scikit-learn = "*"
+geopandas = "*"
 
 [requires]
 python_version = "3.7"
