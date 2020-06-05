@@ -36,7 +36,7 @@ raw_data = pd.read_csv("data/csvs/data.v1.1.csv")
 print(len(raw_data))
 
 data = raw_data.drop(raw_data[raw_data.sampling == 0].index).dropna().drop(
-    columns=['id', 'pop', 'logpop', 'nbHF', 'adjpop', 'sampling', 'total_cases'])
+    columns=['id', 'pop', 'logpop', 'nbHF', 'adjpop', 'sampling', 'total_cases', 'elevation', 'aridity', 'irrigation'])
 print(data.head())
 
 
