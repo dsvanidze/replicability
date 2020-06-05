@@ -68,7 +68,7 @@ model.add(Dense(15,
                 kernel_initializer='he_normal',
                 bias_initializer='zeros',
                 input_shape=(n_cols,)))
-# model.add(Dropout(0.2))
+model.add(Dropout(0.4))
 model.add(BatchNormalization())
 model.add(Activation("relu"))
 
@@ -78,7 +78,7 @@ model.add(Dense(1,
 model.add(BatchNormalization())
 model.add(Activation("linear"))
 
-optimizer = optimizers.Adam(learning_rate=0.02)
+optimizer = optimizers.Adam(learning_rate=0.0001)
 
 # compile model using mse as a measure of model performance
 model.compile(optimizer=optimizer, loss="mean_squared_error",
@@ -89,7 +89,7 @@ model.compile(optimizer=optimizer, loss="mean_squared_error",
 # early_stopping_monitor = EarlyStopping(patience=5000)
 # train model
 history = model.fit(X_train, Y_train, batch_size=512, validation_split=0.2,
-                    epochs=1000, verbose=2, callbacks=[])
+                    epochs=30000, verbose=2, callbacks=[])
 
 # example on how to use our newly trained model on how to make predictions on unseen data (we will pretend our new data is saved in a dataframe called "X_test").
 #Y_test_predictions = model.predict(X_test)
@@ -110,8 +110,8 @@ print(results_train)
 results_test = model.evaluate(X_test, Y_test, batch_size=512)
 print(results_test)
 
-model.save("models-collection/mlp-model-basic.h5")
-print("Saved model to disk")
+# model.save("models-collection/mlp-model-basic.h5")
+# print("Saved model to disk")
 
 
 # Plot training & validation loss values
