@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
+from keras import backend as K
 from keras.callbacks import EarlyStopping
-from keras.layers import Dense, BatchNormalization, Dropout, Activation
+from keras.layers import Dense, BatchNormalization, Dropout, Activation, Lambda
 from keras.models import Sequential
 from keras import optimizers
 from keras import metrics
@@ -12,6 +13,23 @@ import numpy as np
 
 # This set seeds to make the result reproducible
 reproduce(0)
+
+
+def r2_score(y_true, y_pred):
+    SS_res = K.sum(K.square(y_true - y_pred))
+    SS_tot = K.sum(K.square(y_true - K.mean(y_true)))
+    return (1 - SS_res/(SS_tot + K.epsilon()))
+
+
+def r2_score_adj(y_true, y_pred):
+    # TODO: check if there is better implementation of Adj. R2
+    n = Lambda(lambda x: x[0]/x[1])([K.sum(y_true), K.mean(y_true)])
+    p = K.constant(n_cols)
+    one = K.constant(1)
+    SS_res = K.sum(K.square(y_true - y_pred)) / (n - p - one)
+    SS_tot = K.sum(K.square(y_true - K.mean(y_true))) / (n - one)
+    return (1 - SS_res/(SS_tot + K.epsilon()))
+
 
 # read in data using pandas
 raw_data = pd.read_csv("data/csvs/data.v1.1.csv")
@@ -63,7 +81,8 @@ model.add(Activation("linear"))
 optimizer = optimizers.Adam(learning_rate=0.02)
 
 # compile model using mse as a measure of model performance
-model.compile(optimizer=optimizer, loss="mean_squared_error")
+model.compile(optimizer=optimizer, loss="mean_squared_error",
+              metrics=[r2_score, r2_score_adj])
 
 
 # set early stopping monitor so the model stops training when it won"t improve anymore
