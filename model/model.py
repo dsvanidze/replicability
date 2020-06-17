@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from keras import backend as K
-from keras.callbacks import EarlyStopping
+from keras.callbacks import EarlyStopping, TensorBoard
 from keras.layers import Dense, BatchNormalization, Dropout, Activation, Lambda
 from keras.models import Sequential
 from keras import optimizers
@@ -10,9 +10,14 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from reproduce import reproduce
 import numpy as np
+import time
 
 # This set seeds to make the result reproducible
 reproduce(0)
+
+NAME = "covid-19-spatial-prediction-MLP-{}".format(int(time.time()))
+
+tensorboard = TensorBoard(log_dir="logs/{}".format(NAME))
 
 
 def r2_score(y_true, y_pred):
@@ -68,17 +73,45 @@ model = Sequential()
 
 # get number of columns in training data
 validation_split_rate = 0.2
-n_units_of_N_layer = 10
+n_units_of_N_layer = 128
 n_cols = X_train.shape[1]
 train_total = X_train.shape[0]
 batch_size = int(np.floor((1 - validation_split_rate) * train_total))
 
 # add model layers
-model.add(Dense(n_units_of_N_layer,
+model.add(Dense(2048,
                 kernel_initializer='he_normal',
                 bias_initializer='zeros',
                 input_shape=(n_cols,)))
-model.add(Dropout(0.4))
+model.add(Dropout(0.9))
+model.add(BatchNormalization())
+model.add(Activation("relu"))
+
+model.add(Dense(1024,
+                kernel_initializer='he_normal',
+                bias_initializer='zeros'))
+model.add(Dropout(0.9))
+model.add(BatchNormalization())
+model.add(Activation("relu"))
+
+model.add(Dense(512,
+                kernel_initializer='he_normal',
+                bias_initializer='zeros'))
+model.add(Dropout(0.9))
+model.add(BatchNormalization())
+model.add(Activation("relu"))
+
+model.add(Dense(512,
+                kernel_initializer='he_normal',
+                bias_initializer='zeros'))
+model.add(Dropout(0.9))
+model.add(BatchNormalization())
+model.add(Activation("relu"))
+
+model.add(Dense(n_units_of_N_layer,
+                kernel_initializer='he_normal',
+                bias_initializer='zeros'))
+model.add(Dropout(0.9))
 model.add(BatchNormalization())
 model.add(Activation("relu"))
 
@@ -88,18 +121,18 @@ model.add(Dense(1,
 model.add(BatchNormalization())
 model.add(Activation("linear"))
 
-optimizer = optimizers.Adam(learning_rate=0.00005)
+optimizer = optimizers.Adam(learning_rate=0.003)
 
 # compile model using mse as a measure of model performance
 model.compile(optimizer=optimizer, loss="mean_squared_error",
-              metrics=[r2_score, r2_score_adj])
+              metrics=[r2_score_adj])
 
 
 # set early stopping monitor so the model stops training when it won"t improve anymore
-early_stopping_monitor = EarlyStopping(patience=1000)
+# early_stopping_monitor = EarlyStopping(patience=1000)
 # train model
 history = model.fit(X_train, Y_train, batch_size=batch_size, validation_split=validation_split_rate,
-                    epochs=30000, verbose=1, callbacks=[early_stopping_monitor])
+                    epochs=1000, verbose=2, callbacks=[tensorboard])
 
 # example on how to use our newly trained model on how to make predictions on unseen data (we will pretend our new data is saved in a dataframe called "X_test").
 #Y_test_predictions = model.predict(X_test)
@@ -124,18 +157,18 @@ print(results_test)
 # print("Saved model to disk")
 
 
-# Plot training & validation loss values
-plt.plot(history.history['loss'][::100])
-# plt.plot(history.history['val_loss'])
-plt.title('Model loss')
-plt.ylabel('Loss')
-plt.xlabel('Epoch')
-# plt.legend(['Train', 'Test'], loc='upper left')
-plt.show()
+# # Plot training & validation loss values
+# plt.plot(history.history['loss'][::100])
+# # plt.plot(history.history['val_loss'])
+# plt.title('Model loss')
+# plt.ylabel('Loss')
+# plt.xlabel('Epoch')
+# # plt.legend(['Train', 'Test'], loc='upper left')
+# plt.show()
 
-plt.plot(history.history['val_loss'][::100])
-plt.title('Model loss')
-plt.ylabel('Loss')
-plt.xlabel('Epoch')
-# plt.legend(['Train', 'Test'], loc='upper left')
-plt.show()
+# plt.plot(history.history['val_loss'][::100])
+# plt.title('Model loss')
+# plt.ylabel('Loss')
+# plt.xlabel('Epoch')
+# # plt.legend(['Train', 'Test'], loc='upper left')
+# plt.show()
