@@ -68,15 +68,15 @@ X_test = scaler.transform(X_test)
 print(X_train)
 print(X_test)
 
-# create model
-model = Sequential()
-
 # get number of columns in training data
 validation_split_rate = 0.2
 n_units_of_N_layer = 128
 n_cols = X_train.shape[1]
 train_total = X_train.shape[0]
 batch_size = int(np.floor((1 - validation_split_rate) * train_total))
+
+# create model
+model = Sequential()
 
 # add model layers
 model.add(Dense(2048,
