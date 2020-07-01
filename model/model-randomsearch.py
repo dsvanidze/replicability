@@ -134,7 +134,26 @@ tuner.search(X_train, Y_train,
 
 print("######## GET BEST MODELS ########")
 models = tuner.get_best_models()
+best_hyperparameters = tuner.get_best_hyperparameters(1)[0]
 print(models[0].summary())
+print(models[0].evaluate(X_test, Y_test))
+
+def custom_r2(mse, Y):
+    n = len(Y)
+    ss_res = n*mse
+    ss_tot = np.sum(np.square(Y - np.mean(Y)))
+    return 1 - (ss_res/ss_tot)
+
+
+def custom_adj_r2(mse, Y, p):
+    n = len(Y)
+    standard_term = (n - 1) / (n - p - 1)
+    r2 = custom_r2(mse, Y)
+    return 1 - (1 - r2) * standard_term
+
+
+print(custom_r2(0.07716933637857437, Y_test["adj_cases"].to_numpy()))
+print(custom_adj_r2(0.07716933637857437, Y_test["adj_cases"].to_numpy(), 16))
 
 print("######## SUMMARY ########")
-tuner.results_summary()
+# tuner.results_summary(3)
