@@ -18,6 +18,9 @@ tensorflow = "*"
 scikit-learn = "*"
 geopandas = "*"
 keras-tuner = "*"
+shapely = "*"
+descartes = "*"
+mapclassify = "*"
 
 [requires]
 python_version = "3.7"
