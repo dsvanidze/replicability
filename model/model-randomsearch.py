@@ -4,6 +4,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, BatchNormalization, Dropout, Activation, Lambda, InputLayer
 from tensorflow.keras.optimizers import Adam
 from kerastuner.tuners import RandomSearch
+from tensorflow.keras import metrics
 
 import matplotlib.pyplot as plt
 from keras import backend as K
@@ -23,7 +24,7 @@ from tensorboard.plugins.hparams import api as hp
 import tensorflow as tf
 
 # This set seeds to make the result reproducible
-reproduce(0)
+# reproduce(0)
 
 # NAME = "covid-19-spatial-prediction-MLP-{}".format(int(time.time()))
 
@@ -46,45 +47,31 @@ tensorboard = TensorBoard(log_dir="logs/")
 #     SS_tot = K.sum(K.square(y_true - K.mean(y_true))) / (n - one)
 #     return (1 - SS_res/(SS_tot + K.epsilon()))
 
-def train_val_test_split(X, Y):
-    # check data has been read in properly
-    _X_train, X_test, _Y_train, Y_test = train_test_split(
-        X, Y, test_size=0.2, random_state=0)
-
-    X_train, X_val, Y_train, Y_val = train_test_split(
-        _X_train, _Y_train, test_size=0.25, random_state=0)  # 0.25 x 0.8 = 0.2
-    return X_train, X_val, X_test, Y_train, Y_val, Y_test
-
-
 # read in data using pandas
-raw_data = pd.read_csv("data/csvs/data.v1.1.csv")
-print(len(raw_data))
 
-data = raw_data.drop(raw_data[raw_data.sampling == 0].index).dropna().drop(
-    columns=['id', 'pop', 'logpop', 'nbHF', 'adjpop', 'sampling', 'total_cases', 'elevation', 'aridity', 'irrigation'])
-print(data.head())
+def get_data():
+    data = {
+        "train": pd.read_csv("data/csvs/split/train.csv", index_col="index"),
+        "validation": pd.read_csv("data/csvs/split/validation.csv", index_col="index"),
+        "test": pd.read_csv("data/csvs/split/test.csv", index_col="index"),
+    }
 
-data['adj_cases'] = np.log(data[["adj_cases"]] + 1)
+    for key in data:
+        data[key]["longitude"] = data[key]["longitude"] / 180
+        data[key]["latitude"] = data[key]["latitude"] / 90
+        data[key]["adj_cases"] = np.log(data[key]["adj_cases"] + 1)
 
-print(data['adj_cases'])
+    X_train = data["train"].drop("adj_cases", axis=1)
+    Y_train = data["train"]["adj_cases"]
+    X_validation = data["validation"].drop("adj_cases", axis=1)
+    Y_validation = data["validation"]["adj_cases"]
+    X_test = data["test"].drop("adj_cases", axis=1)
+    Y_test = data["test"]["adj_cases"]
+
+    return X_train, Y_train, X_validation, Y_validation, X_test, Y_test
 
 
-# create a dataframe with all training data except the target column
-X = data.drop(columns=["adj_cases"])
-
-# create a dataframe with only the target column
-Y = data[["adj_cases"]]
-
-X_train, X_val, X_test, Y_train, Y_val, Y_test = train_val_test_split(X, Y)
-
-scaler = StandardScaler()
-scaler.fit(X_train)
-X_train = scaler.transform(X_train)
-X_val = scaler.transform(X_val)
-X_test = scaler.transform(X_test)
-# data[data.columns, -"cases"] = scaler.fit_transform(data[data.columns, -"cases"])
-# print(X_train)
-# print(X_test)
+X_train, Y_train, X_validation, Y_validation, X_test, Y_test = get_data()
 
 # get number of columns in training data
 validation_split_rate = 0.2
@@ -98,29 +85,29 @@ def build_model(hp):
     model = Sequential()
     model.add(InputLayer(input_shape=(n_cols,)))
 
-    for i in range(hp.Int('num_layers', 2, 20)):
+    for i in range(hp.Int('num_layers', 2, 10)):
         model.add(Dense(units=hp.Int('units_' + str(i), min_value=16,
                                      max_value=512, step=16),
                         activation='relu',
                         kernel_initializer='he_normal',
                         bias_initializer='zeros'))
         model.add(Dropout(rate=hp.Float('dropout_' + str(i), min_value=0.0,
-                                        max_value=0.99, step=0.2)))
+                                        max_value=0.9, step=0.3)))
 
     model.add(Dense(1, activation='linear',
                     kernel_initializer='he_normal',
                     bias_initializer='zeros'))
     model.compile(optimizer=Adam(hp.Choice('learning_rate', values=[
-                  1e-2, 1e-3, 1e-4, 1e-5])), loss='mean_squared_error', metrics=['mse'])
+                  1e-2, 1e-3, 1e-4, 1e-5])), loss='mean_squared_error', metrics=[metrics.MeanSquaredError(), metrics.RootMeanSquaredError(), metrics.MeanAbsoluteError(), metrics.MeanAbsolutePercentageError(), metrics.MeanSquaredLogarithmicError(), metrics.Poisson()])
     return model
 
 
 tuner = RandomSearch(
     build_model,
     seed=0,
-    objective='val_mse',
-    max_trials=100,
-    executions_per_trial=3,
+    objective='val_mean_squared_error',
+    max_trials=50,
+    executions_per_trial=1,
     directory='random-search',
     project_name='covid-19-nn')
 
@@ -129,7 +116,7 @@ tuner.search_space_summary()
 tuner.search(X_train, Y_train,
              epochs=1000,
              batch_size=train_total,
-             validation_data=(X_val, Y_val),
+             validation_data=(X_validation, Y_validation),
              callbacks=[tensorboard])
 
 print("######## GET BEST MODELS ########")
@@ -137,6 +124,7 @@ models = tuner.get_best_models()
 best_hyperparameters = tuner.get_best_hyperparameters(1)[0]
 print(models[0].summary())
 print(models[0].evaluate(X_test, Y_test))
+
 
 def custom_r2(mse, Y):
     n = len(Y)
@@ -152,8 +140,8 @@ def custom_adj_r2(mse, Y, p):
     return 1 - (1 - r2) * standard_term
 
 
-print(custom_r2(0.07716933637857437, Y_test["adj_cases"].to_numpy()))
-print(custom_adj_r2(0.07716933637857437, Y_test["adj_cases"].to_numpy(), 16))
+print(custom_r2(0.5159257054328918, Y_test.to_numpy()))
+print(custom_adj_r2(0.5159257054328918, Y_test.to_numpy(), 16))
 
 print("######## SUMMARY ########")
 # tuner.results_summary(3)
