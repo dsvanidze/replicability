@@ -98,7 +98,7 @@ def build_model(hp):
                     kernel_initializer='he_normal',
                     bias_initializer='zeros'))
     model.compile(optimizer=Adam(hp.Choice('learning_rate', values=[
-                  1e-2, 1e-3, 1e-4, 1e-5])), loss='mean_squared_error', metrics=[metrics.MeanSquaredError(), metrics.RootMeanSquaredError(), metrics.MeanAbsoluteError(), metrics.MeanAbsolutePercentageError(), metrics.MeanSquaredLogarithmicError(), metrics.Poisson()])
+                  1e-2, 1e-3, 1e-4, 1e-5])), loss='mean_squared_error', metrics=[metrics.MeanSquaredError(), metrics.RootMeanSquaredError(), metrics.MeanAbsoluteError(), metrics.MeanAbsolutePercentageError(), metrics.MeanSquaredLogarithmicError()])
     return model
 
 
@@ -113,18 +113,22 @@ tuner = RandomSearch(
 
 tuner.search_space_summary()
 
-tuner.search(X_train, Y_train,
-             epochs=1000,
-             batch_size=train_total,
-             validation_data=(X_validation, Y_validation),
-             callbacks=[tensorboard])
+# tuner.search(X_train, Y_train,
+#              epochs=1000,
+#              batch_size=train_total,
+#              validation_data=(X_validation, Y_validation),
+#              callbacks=[tensorboard])
 
 print("######## GET BEST MODELS ########")
 models = tuner.get_best_models()
-best_hyperparameters = tuner.get_best_hyperparameters(1)[0]
 print(models[0].summary())
 print(models[0].evaluate(X_test, Y_test))
+# print(tuner.results_summary(1))
 
+
+
+# Save the best model
+# models[0].save("./models-collection/mlp-model-best-randomsearch-1")
 
 def custom_r2(mse, Y):
     n = len(Y)
