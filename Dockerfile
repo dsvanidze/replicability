@@ -1,5 +1,9 @@
-FROM tensorflow/tensorflow
-# FROM jupyter/scipy-notebook:17aba6048f44
+FROM conda/miniconda3
 WORKDIR /all
-COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+COPY environment.yml ./
+RUN conda update conda
+RUN conda env create -f environment.yml
+ENV BASH_ENV ~/.bashrc
+SHELL ["/bin/bash", "-c"]
+RUN conda init
+RUN echo "conda activate bachelor" >> ~/.bashrc
