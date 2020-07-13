@@ -1,0 +1,14 @@
+name: bachelor
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - pandas
+  - python=3.7
+  - matplotlib
+  - keras
+  - tensorflow
+  - scikit-learn
+  - keras-tuner
+prefix: /usr/local/envs/bachelor
+
