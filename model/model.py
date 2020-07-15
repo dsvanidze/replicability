@@ -13,7 +13,7 @@ from sklearn.preprocessing import StandardScaler
 from reproduce import reproduce
 import numpy as np
 import time
-from load_data import get_data
+from utils import get_data, plot_predicted_vs_true
 # from adabound_tf import AdaBound
 from datetime import datetime
 
@@ -142,37 +142,9 @@ results_test = model.evaluate(X_test, Y_test, batch_size=train_total)
 print(results_test)
 
 
-def plot_predicted_vs_true(Xs, Ys):
-    predicted_values = [np.squeeze(model.predict(X)) for X in Xs]
-    true_values = [Y.to_numpy() for Y in Ys]
-    # plt.scatter(true_values, true_values, s=10, c="red", alpha=0.3)
-    # plt.scatter(true_values, predicted_values, s=10, alpha=0.3)
-    # plt.xlim(np.min(true_values)-0.5, np.max(true_values)+0.5)
-    # plt.ylim(np.min(true_values)-0.5, np.max(true_values)+0.5)
-    # plt.xlabel('True values')
-    # plt.ylabel('Predicted values')
-    # plt.show()
-    titles = ["Training set", "Validation set", "Test set"]
-    mses = [model.evaluate(Xs[i], Ys[i], batch_size=train_total)[1]
-            for i in range(3)]
-
-    fig, axs = plt.subplots(1, 3, figsize=(16, 4))
-    for i in range(3):
-        axs[i].scatter(true_values[i], true_values[i],
-                       s=10, c="red", alpha=0.3)
-        axs[i].scatter(true_values[i], predicted_values[i], s=10, alpha=0.3)
-        axs[i].set(xlim=[np.min(true_values[i]) - 0.5, np.max(true_values[i]) + 0.5],
-                   ylim=[np.min(true_values[i]) - 0.5,
-                         np.max(true_values[i]) + 0.5],
-                   xlabel="True values",
-                   ylabel="Predicted values")
-        axs[i].set_title("{}\nMSE={:.4f}".format(titles[i], mses[i]))
-
-    plt.show()
-
-
-# plot_predicted_vs_true([X_train, X_validation, X_test],
-#                        [Y_train, Y_validation, Y_test])
+plot_predicted_vs_true(Xs=[X_train, X_validation, X_test],
+                       Ys=[Y_train, Y_validation, Y_test],
+                       model=model)
 
 # plot_predicted_vs_true(X_validation, Y_validation)
 # plot_predicted_vs_true(X_test, Y_test)
