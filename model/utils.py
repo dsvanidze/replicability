@@ -45,3 +45,17 @@ def plot_predicted_vs_true(Xs, Ys, model):
         axs[i].set_title("{}\nMSE={:.4f}".format(titles[i], mses[i]))
 
     plt.show()
+
+
+def custom_r2(mse, Y):
+    n = len(Y)
+    ss_res = n*mse
+    ss_tot = np.sum(np.square(Y - np.mean(Y)))
+    return 1 - (ss_res/ss_tot)
+
+
+def custom_adj_r2(mse, Y, p):
+    n = len(Y)
+    standard_term = (n - 1) / (n - p - 1)
+    r2 = custom_r2(mse, Y)
+    return 1 - (1 - r2) * standard_term
