@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   bachelor:
-    # image: deep-learning
+    # image: covid-19-ml
     build: .
     ports:
       - 9999:9999
