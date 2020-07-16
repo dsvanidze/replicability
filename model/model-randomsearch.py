@@ -51,7 +51,7 @@ def build_model(hp):
 
     for i in range(hp.Int('num_layers', 2, 10)):
         model.add(Dense(units=hp.Int('units_' + str(i), min_value=32,
-                                     max_value=512, step=32),
+                                     max_value=1024, step=32),
                         activation='relu',
                         kernel_initializer='glorot_uniform',
                         bias_initializer='zeros'))
@@ -83,15 +83,15 @@ tuner = RandomSearch(
 
 if TRAINING:
     tuner.search_space_summary()
-    early_stopping_monitor = EarlyStopping(
-        patience=200, baseline=0.5)
+    # early_stopping_monitor = EarlyStopping(
+    #     patience=200, baseline=0.5)
     # Use .values to convert pandas dataframe to numpy array
     # To avoid the Warning -> WARNING:tensorflow:Falling back from v2 loop because of error: Failed to find data adapter that can handle input: <class 'pandas.core.frame.DataFrame'>, <class 'NoneType'>
     tuner.search(X_train.values, Y_train.values,
                  epochs=5000,
                  batch_size=train_total,
                  validation_data=(X_validation.values, Y_validation.values),
-                 callbacks=[tensorboard, early_stopping_monitor])
+                 callbacks=[tensorboard])
 
     # all other trial_ids than top 3
     trial_ids_to_remove = [best_trial.trial_id for best_trial in tuner.oracle.get_best_trials(
@@ -122,7 +122,7 @@ if not TRAINING:
                            Ys=[Y_train, Y_validation, Y_test],
                            model=models[0])
 # # Save the best model
-# models[0].save("./models-collection/mlp-model-best-randomsearch-3")
+# models[0].save("./models-collection/mlp-model-best-randomsearch-4")
 
 
 # # Instantiate a model with the best hyperparameters -> makes the model retrainable
