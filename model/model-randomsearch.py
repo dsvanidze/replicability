@@ -49,9 +49,9 @@ def build_model(hp):
     model = Sequential()
     model.add(InputLayer(input_shape=(n_cols,)))
 
-    for i in range(hp.Int('num_layers', 2, 10)):
+    for i in range(hp.Int('num_layers', 2, 6)):
         model.add(Dense(units=hp.Int('units_' + str(i), min_value=32,
-                                     max_value=1024, step=32),
+                                     max_value=2048, step=64),
                         activation='relu',
                         kernel_initializer='glorot_uniform',
                         bias_initializer='zeros'))
