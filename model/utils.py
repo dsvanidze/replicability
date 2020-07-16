@@ -29,7 +29,7 @@ def plot_predicted_vs_true(Xs, Ys, model):
     predicted_values = [np.squeeze(model.predict(X)) for X in Xs]
     true_values = [Y.to_numpy() for Y in Ys]
     titles = ["Training set", "Validation set", "Test set"]
-    mses = [model.evaluate(Xs[i], Ys[i], batch_size=Xs[i].shape[0])[1]
+    mses = [model.evaluate(Xs[i], Ys[i], batch_size=Xs[i].shape[0])[0]
             for i in range(3)]
 
     fig, axs = plt.subplots(1, 3, figsize=(16, 4))
