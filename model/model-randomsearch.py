@@ -49,18 +49,18 @@ def build_model(hp):
     model = Sequential()
     model.add(InputLayer(input_shape=(n_cols,)))
 
-    for i in range(hp.Int('num_layers', 2, 6)):
+    for i in range(hp.Int('num_layers', 1, 1)):
         model.add(Dense(units=hp.Int('units_' + str(i), min_value=32,
-                                     max_value=2048, step=64),
+                                     max_value=4096, step=32),
                         activation='relu',
-                        kernel_initializer='glorot_uniform',
+                        kernel_initializer='he_uniform',
                         bias_initializer='zeros'))
         model.add(BatchNormalization())
         model.add(Dropout(rate=hp.Float('dropout_' + str(i), min_value=0.0,
                                         max_value=0.9, step=0.1)))
 
     model.add(Dense(1, activation='linear',
-                    kernel_initializer='glorot_uniform',
+                    kernel_initializer='he_uniform',
                     bias_initializer='zeros'))
     model.compile(optimizer=Adam(hp.Choice('learning_rate',
                                            values=[0.005, 0.001, 0.0005, 0.0001, 0.00005, 0.00001])),
@@ -69,7 +69,7 @@ def build_model(hp):
     return model
 
 
-max_trial = 1000
+max_trial = 7000
 
 tuner = RandomSearch(
     build_model,
@@ -80,7 +80,6 @@ tuner = RandomSearch(
     directory='random-search',
     project_name='covid-19-nn')
 
-
 if TRAINING:
     tuner.search_space_summary()
     # early_stopping_monitor = EarlyStopping(
@@ -88,10 +87,10 @@ if TRAINING:
     # Use .values to convert pandas dataframe to numpy array
     # To avoid the Warning -> WARNING:tensorflow:Falling back from v2 loop because of error: Failed to find data adapter that can handle input: <class 'pandas.core.frame.DataFrame'>, <class 'NoneType'>
     tuner.search(X_train.values, Y_train.values,
-                 epochs=5000,
+                 epochs=1000,
                  batch_size=train_total,
                  validation_data=(X_validation.values, Y_validation.values),
-                 callbacks=[tensorboard])
+                 callbacks=[])
 
     # all other trial_ids than top 3
     trial_ids_to_remove = [best_trial.trial_id for best_trial in tuner.oracle.get_best_trials(
@@ -122,7 +121,7 @@ if not TRAINING:
                            Ys=[Y_train, Y_validation, Y_test],
                            model=models[0])
 # # Save the best model
-# models[0].save("./models-collection/mlp-model-best-randomsearch-4")
+# models[0].save("./models-collection/mlp-model-best-randomsearch-5")
 
 
 # # Instantiate a model with the best hyperparameters -> makes the model retrainable
