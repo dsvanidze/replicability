@@ -52,15 +52,18 @@ def build_model(hp):
     model = Sequential()
     model.add(InputLayer(input_shape=(n_cols,)))
 
-    for i in range(hp.Int('num_layers', 1, 1)):
-        model.add(Dense(units=hp.Int('units_' + str(i), min_value=32,
-                                     max_value=4096, step=32),
+    num_units_per_layer = hp.Int('units_per_hidden_layer', min_value=32,
+                                 max_value=4096, step=32)
+    dropout_rate_per_layer = hp.Float('dropout_per_hidden_layer', min_value=0.0,
+                                      max_value=0.9, step=0.1)
+
+    for i in range(hp.Int('num_layers', 2, 2)):
+        model.add(Dense(units=num_units_per_layer,
                         activation='relu',
                         kernel_initializer='he_uniform',
                         bias_initializer='zeros'))
         model.add(BatchNormalization())
-        model.add(Dropout(rate=hp.Float('dropout_' + str(i), min_value=0.0,
-                                        max_value=0.9, step=0.1)))
+        model.add(Dropout(rate=dropout_rate_per_layer))
 
     model.add(Dense(1, activation='linear',
                     kernel_initializer='he_uniform',
@@ -128,7 +131,7 @@ if not TRAINING and not CLEAN:
                            Ys=[Y_train, Y_validation, Y_test],
                            model=models[0])
 # # Save the best model
-# models[0].save("./models-collection/mlp-model-best-randomsearch-5")
+# models[0].save("./best-models/one-hidden-layer")
 
 
 # # Instantiate a model with the best hyperparameters -> makes the model retrainable
