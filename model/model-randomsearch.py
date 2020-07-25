@@ -12,7 +12,7 @@ from keras import metrics
 import pandas as pd
 from reproduce import reproduce
 import numpy as np
-from tensorboard.plugins.hparams import api as hp
+# from tensorboard.plugins.hparams import api as hp
 import tensorflow as tf
 from utils import get_data, plot_predicted_vs_true, custom_r2, custom_adj_r2
 from datetime import datetime
@@ -21,10 +21,13 @@ import os
 import sys
 
 TRAINING = False
+CLEAN = False
 
 if len(sys.argv) > 1:
     if sys.argv[1] == "train":
         TRAINING = True
+    if sys.argv[1] == "clean":
+        CLEAN = True
 
 begin = datetime.now()
 # This set seeds to make the result reproducible
@@ -92,14 +95,18 @@ if TRAINING:
                  validation_data=(X_validation.values, Y_validation.values),
                  callbacks=[])
 
+if CLEAN:
     # all other trial_ids than top 3
     trial_ids_to_remove = [best_trial.trial_id for best_trial in tuner.oracle.get_best_trials(
         num_trials=max_trial)[3:]]
 
     for trial_id in trial_ids_to_remove:
-        rmtree("random-search/covid-19-nn/trial_{}".format(trial_id))
-        rmtree("logs/{}".format(trial_id))
-
+        rsPath = "random-search/covid-19-nn/trial_{}".format(trial_id)
+        logsPath = "logs/{}".format(trial_id)
+        if os.path.isdir(rsPath):
+            rmtree(rsPath)
+        if os.path.isdir(logsPath):
+            rmtree(logsPath)
 
 print("######## GET BEST MODELS ########")
 models = tuner.get_best_models()
@@ -116,7 +123,7 @@ print("Adj. R2:", custom_adj_r2(evaluation[0], Y_test.to_numpy(), 16))
 print("######## SUMMARY ########")
 print("Overall Runtime:", datetime.now() - begin)
 
-if not TRAINING:
+if not TRAINING and not CLEAN:
     plot_predicted_vs_true(Xs=[X_train, X_validation, X_test],
                            Ys=[Y_train, Y_validation, Y_test],
                            model=models[0])
