@@ -3,12 +3,12 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - pandas
-  - python=3.7
-  - matplotlib
   - keras
   - tensorflow
-  - scikit-learn
+  - pandas
   - keras-tuner
+  - scikit-learn
+  - matplotlib
+  - xgboost
 prefix: /usr/local/envs/bachelor
 

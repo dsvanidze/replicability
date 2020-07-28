@@ -7,3 +7,4 @@ ENV BASH_ENV ~/.bashrc
 SHELL ["/bin/bash", "-c"]
 RUN conda init
 RUN echo "conda activate bachelor" >> ~/.bashrc
+RUN /bin/bash -c "conda config --env --add channels conda-forge"
