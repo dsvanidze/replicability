@@ -131,7 +131,7 @@ if not TRAINING and not CLEAN:
                            Ys=[Y_train, Y_validation, Y_test],
                            model=models[0])
 # # Save the best model
-# models[0].save("./best-models/one-hidden-layer")
+# models[0].save("./best-models/two-hidden-layers")
 
 
 # # Instantiate a model with the best hyperparameters -> makes the model retrainable
