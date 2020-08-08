@@ -6,10 +6,10 @@ services:
     build: .
     ports:
       - 9999:9999
-      - 6006:6006
     working_dir: /all
     volumes:
       - .:/all
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
     stdin_open: true # docker run -i
     tty: true # docker run -t
-    # command: bash
