@@ -1,14 +1,22 @@
 name: bachelor
 channels:
+  - anaconda
   - conda-forge
   - defaults
 dependencies:
-  - keras
-  - tensorflow
+  - python=3.7
   - pandas
+  - keras
   - keras-tuner
   - scikit-learn
   - matplotlib
+  - tensorflow
+  - notebook
+  - rasterio
+  - xarray
+  - seaborn
+  - nomkl
+  - jupyterlab
   - xgboost
-prefix: /usr/local/envs/bachelor
+prefix: /Users/davitsvanidze/miniconda3/envs/bachelor
 
