@@ -5,7 +5,8 @@ services:
     # image: covid-19-ml
     build: .
     ports:
-      - 9999:9999
+      - 9008:9008 # user for local jupyter
+      - 9009:9009 # user for ssh jupyter
     working_dir: /all
     volumes:
       - .:/all
