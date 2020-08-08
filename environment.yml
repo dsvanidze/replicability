@@ -1,6 +1,5 @@
 name: bachelor
 channels:
-  - anaconda
   - conda-forge
   - defaults
 dependencies:
@@ -19,4 +18,3 @@ dependencies:
   - jupyterlab
   - xgboost
 prefix: /Users/davitsvanidze/miniconda3/envs/bachelor
-
