@@ -4,18 +4,19 @@ channels:
   - defaults
 dependencies:
   - python=3.7
-  - scikit-learn
-  - tensorflow
-  - seaborn
-  - matplotlib
-  - notebook
-  - xgboost
-  - xarray
-  - rasterio
-  - keras-tuner
-  - jupyterlab
-  - keras
-  - nomkl
   - pandas
+  - keras
+  - notebook
+  - rasterio
+  - matplotlib
+  - jupyterlab
+  - nomkl
+  - scikit-learn
+  - seaborn
+  - tensorflow
   - geopandas
-prefix: /Users/davitsvanidze/miniconda3/envs/bachelor
+  - keras-tuner
+  - xarray
+  - xgboost
+  - descartes
+prefix: /usr/local/envs/bachelor
