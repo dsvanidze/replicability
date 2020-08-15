@@ -2,12 +2,14 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+import os
+ROOT_DIR = os.path.normpath(os.path.join(__file__, *[os.pardir]*2)) # This is your Project Root
 
 def get_data():
     data = {
-        "train": pd.read_csv("data/csvs/split/train.csv", index_col="index"),
-        "validation": pd.read_csv("data/csvs/split/validation.csv", index_col="index"),
-        "test": pd.read_csv("data/csvs/split/test.csv", index_col="index"),
+        "train": pd.read_csv(ROOT_DIR + "/data/csvs/split/train.csv", index_col="index"),
+        "validation": pd.read_csv(ROOT_DIR + "/data/csvs/split/validation.csv", index_col="index"),
+        "test": pd.read_csv(ROOT_DIR + "/data/csvs/split/test.csv", index_col="index"),
     }
 
     for key in data:
