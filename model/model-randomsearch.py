@@ -7,10 +7,10 @@ from kerastuner.tuners import RandomSearch
 from tensorflow.keras import metrics
 
 import matplotlib.pyplot as plt
-from keras.callbacks import TensorBoard, EarlyStopping
-from keras import metrics
+# from keras.callbacks import TensorBoard, EarlyStopping
+# from keras import metrics
 import pandas as pd
-from reproduce import reproduce
+# from reproduce import reproduce
 import numpy as np
 # from tensorboard.plugins.hparams import api as hp
 import tensorflow as tf
@@ -34,7 +34,7 @@ begin = datetime.now()
 # reproduce(0)
 
 
-tensorboard = TensorBoard(log_dir="logs/")
+# tensorboard = TensorBoard(log_dir="logs/")
 
 # read in data using pandas
 
