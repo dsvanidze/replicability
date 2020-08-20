@@ -27,14 +27,14 @@ def get_data():
     return X_train, Y_train, X_validation, Y_validation, X_test, Y_test
 
 
-def plot_predicted_vs_true(Xs, Ys, model):
+def plot_predicted_vs_true(Xs, Ys, model, path=None):
     predicted_values = [np.squeeze(model.predict(X)) for X in Xs]
     true_values = [Y.to_numpy() for Y in Ys]
     titles = ["Training set", "Validation set", "Test set"]
     mses = [model.evaluate(Xs[i], Ys[i], batch_size=Xs[i].shape[0])[0]
             for i in range(3)]
 
-    fig, axs = plt.subplots(1, 3, figsize=(16, 4))
+    fig, axs = plt.subplots(1, 3, figsize=(18, 6))
     for i in range(3):
         axs[i].scatter(true_values[i], true_values[i],
                        s=10, c="red", alpha=0.3)
@@ -45,7 +45,9 @@ def plot_predicted_vs_true(Xs, Ys, model):
                    xlabel="True values",
                    ylabel="Predicted values")
         axs[i].set_title("{}\nMSE={:.4f}".format(titles[i], mses[i]))
-
+        
+    if path:
+        plt.savefig(path, dpi=200)
     plt.show()
 
 
