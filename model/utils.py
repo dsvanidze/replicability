@@ -34,7 +34,7 @@ def plot_predicted_vs_true(Xs, Ys, model, path=None):
     mses = [model.evaluate(Xs[i], Ys[i], batch_size=Xs[i].shape[0])[0]
             for i in range(3)]
 
-    fig, axs = plt.subplots(1, 3, figsize=(16, 4))
+    fig, axs = plt.subplots(1, 3, figsize=(18, 6))
     for i in range(3):
         axs[i].scatter(true_values[i], true_values[i],
                        s=10, c="red", alpha=0.3)
