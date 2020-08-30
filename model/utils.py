@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
 
 import os
 ROOT_DIR = os.path.normpath(os.path.join(__file__, *[os.pardir]*2)) # This is your Project Root
@@ -27,11 +28,12 @@ def get_data():
     return X_train, Y_train, X_validation, Y_validation, X_test, Y_test
 
 
-def plot_predicted_vs_true(Xs, Ys, model, path=None):
-    predicted_values = [np.squeeze(model.predict(X)) for X in Xs]
-    true_values = [Y.to_numpy() for Y in Ys]
+def plot_predicted_vs_true(Xs, Ys, predicted_set_values, path=None):
+    predicted_values = predicted_set_values
+    true_values = [Y.values for Y in Ys]
     titles = ["Training set", "Validation set", "Test set"]
-    mses = [model.evaluate(Xs[i], Ys[i], batch_size=Xs[i].shape[0])[0]
+    rmses = [np.sqrt(mean_squared_error(y_true=Ys[i], 
+                                        y_pred=predicted_set_values[i]))
             for i in range(3)]
 
     fig, axs = plt.subplots(1, 3, figsize=(24, 6))
@@ -39,15 +41,19 @@ def plot_predicted_vs_true(Xs, Ys, model, path=None):
         axs[i].scatter(true_values[i], true_values[i],
                        s=10, c="red", alpha=0.3)
         axs[i].scatter(true_values[i], predicted_values[i], s=10, alpha=0.3)
-        axs[i].set(xlim=[np.min(true_values[i]) - 0.5, np.max(true_values[i]) + 0.5],
+        axs[i].set(xlim=[np.min(true_values[i]) - 0.5, np.max(true_values[i]) + 0.6],
                    ylim=[np.min(true_values[i]) - 0.5,
-                         np.max(true_values[i]) + 0.5],
-                   xlabel="True values",
-                   ylabel="Predicted values")
-        axs[i].set_title("{}\nMSE={:.4f}".format(titles[i], mses[i]))
+                         np.max(true_values[i]) + 0.6])
+        
+        axs[i].tick_params(labelsize=20)
+        axs[i].set_xlabel(xlabel="True values", fontsize=20, labelpad=20)
+        axs[i].set_ylabel(ylabel="Predicted values", fontsize=20, labelpad=20)
+        axs[i].set_title("{}\nRMSE={:.4f}".format(titles[i], rmses[i]),
+                         fontdict={"fontsize": 25}, 
+                         pad=20)
         
     if path:
-        plt.savefig(path, dpi=200)
+        plt.savefig(path, dpi=200, bbox_inches='tight')
     plt.show()
 
 
@@ -55,7 +61,7 @@ def plot_true_vs_error(Xs, Ys, model):
     predicted_values = [np.squeeze(model.predict(X)) for X in Xs]
     true_values = [np.squeeze(Y.to_numpy()) for Y in Ys]
     titles = ["Training set", "Validation set", "Test set"]
-    mses = [model.evaluate(Xs[i], Ys[i], batch_size=Xs[i].shape[0])[0]
+    rmses = [np.sqrt(model.evaluate(Xs[i], Ys[i], verbose=0)[0])
             for i in range(3)]
     errors = [true_values[i] - predicted_values[i] for i in range(3)]
 
@@ -69,7 +75,8 @@ def plot_true_vs_error(Xs, Ys, model):
                             np.max(true_values[i]) + 0.5],
                       xlabel="True values",
                       ylabel="Predicted values")
-        axs[0][i].set_title("{}\nMSE={:.4f}".format(titles[i], mses[i]))
+        axs[0][i].tick_params(labelsize=20)
+        axs[0][i].set_title("{}\nRMSE={:.4f}".format(titles[i], rmses[i]))
 
         axs[1][i].scatter(true_values[i], errors[i],
                           c="green", s=10, alpha=0.3)
@@ -78,6 +85,7 @@ def plot_true_vs_error(Xs, Ys, model):
                             np.max(errors[i]) + 0.5],
                       xlabel="True values",
                       ylabel="Errors")
+        axs[1][i].tick_params(labelsize=20)
 
     plt.show()
 
@@ -97,15 +105,17 @@ def plot_error_histograms(Xs, Ys, model):
     plt.show()
 
 
-def custom_r2(mse, Y):
-    n = len(Y)
+def custom_r2(Y_true, Y_predictions):
+    n = len(Y_true.values)
+    mse = mean_squared_error(y_true=Y_true, y_pred=Y_predictions)
     ss_res = n*mse
-    ss_tot = np.sum(np.square(Y - np.mean(Y)))
+    ss_tot = np.sum(np.square(Y_true.values - np.mean(Y_true.values)))
     return 1 - (ss_res/ss_tot)
 
 
-def custom_adj_r2(mse, Y, p):
-    n = len(Y)
+def custom_adj_r2(Y_true, Y_predictions, p):
+    n = len(Y_true.values)
     standard_term = (n - 1) / (n - p - 1)
-    r2 = custom_r2(mse, Y)
+    mse = mean_squared_error(y_true=Y_true.values, y_pred=Y_predictions)
+    r2 = custom_r2(Y_true, Y_predictions)
     return 1 - (1 - r2) * standard_term
