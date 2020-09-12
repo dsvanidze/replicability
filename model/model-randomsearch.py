@@ -2,89 +2,43 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, BatchNormalization, Dropout, Activation, Lambda, InputLayer
-from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.optimizers import SGD, RMSprop, Adam, Adadelta, Adagrad, Adamax, Nadam, Ftrl
 from kerastuner.tuners import RandomSearch
+from tensorflow.keras import metrics
 
 import matplotlib.pyplot as plt
-from keras import backend as K
-
-from keras.callbacks import EarlyStopping, TensorBoard
-# from keras.layers import Dense, BatchNormalization, Dropout, Activation, Lambda, InputLayer
-# from keras.models import Sequential
-# from keras import optimizers
-from keras import metrics
+# from keras.callbacks import TensorBoard, EarlyStopping
+# from keras import metrics
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from reproduce import reproduce
+# from reproduce import reproduce
 import numpy as np
-import time
-from tensorboard.plugins.hparams import api as hp
+# from tensorboard.plugins.hparams import api as hp
 import tensorflow as tf
+from utils import get_data, plot_predicted_vs_true, custom_r2, custom_adj_r2
+from datetime import datetime
+from shutil import rmtree
+import os
+import sys
 
+TRAINING = False
+CLEAN = False
+
+if len(sys.argv) > 1:
+    if sys.argv[1] == "train":
+        TRAINING = True
+    if sys.argv[1] == "clean":
+        CLEAN = True
+
+begin = datetime.now()
 # This set seeds to make the result reproducible
-reproduce(0)
-
-# NAME = "covid-19-spatial-prediction-MLP-{}".format(int(time.time()))
-
-tensorboard = TensorBoard(log_dir="logs/")
+# reproduce(0)
 
 
-# def r2_score(y_true, y_pred):
-#     from keras import backend as K
-#     SS_res = K.sum(K.square(y_true - y_pred))
-#     SS_tot = K.sum(K.square(y_true - K.mean(y_true)))
-#     return (1 - SS_res/(SS_tot + K.epsilon()))
-
-
-# def r2_score_adj(y_true, y_pred):
-#     # TODO: check if there is better implementation of Adj. R2
-#     n = Lambda(lambda x: x[0]/x[1])([K.sum(y_true), K.mean(y_true)])
-#     p = K.constant(n_units_of_N_layer)
-#     one = K.constant(1)
-#     SS_res = K.sum(K.square(y_true - y_pred)) / (n - p - one)
-#     SS_tot = K.sum(K.square(y_true - K.mean(y_true))) / (n - one)
-#     return (1 - SS_res/(SS_tot + K.epsilon()))
-
-def train_val_test_split(X, Y):
-    # check data has been read in properly
-    _X_train, X_test, _Y_train, Y_test = train_test_split(
-        X, Y, test_size=0.2, random_state=0)
-
-    X_train, X_val, Y_train, Y_val = train_test_split(
-        _X_train, _Y_train, test_size=0.25, random_state=0)  # 0.25 x 0.8 = 0.2
-    return X_train, X_val, X_test, Y_train, Y_val, Y_test
-
+# tensorboard = TensorBoard(log_dir="logs/")
 
 # read in data using pandas
-raw_data = pd.read_csv("data/csvs/data.v1.1.csv")
-print(len(raw_data))
 
-data = raw_data.drop(raw_data[raw_data.sampling == 0].index).dropna().drop(
-    columns=['id', 'pop', 'logpop', 'nbHF', 'adjpop', 'sampling', 'total_cases', 'elevation', 'aridity', 'irrigation'])
-print(data.head())
-
-data['adj_cases'] = np.log(data[["adj_cases"]] + 1)
-
-print(data['adj_cases'])
-
-
-# create a dataframe with all training data except the target column
-X = data.drop(columns=["adj_cases"])
-
-# create a dataframe with only the target column
-Y = data[["adj_cases"]]
-
-X_train, X_val, X_test, Y_train, Y_val, Y_test = train_val_test_split(X, Y)
-
-scaler = StandardScaler()
-scaler.fit(X_train)
-X_train = scaler.transform(X_train)
-X_val = scaler.transform(X_val)
-X_test = scaler.transform(X_test)
-# data[data.columns, -"cases"] = scaler.fit_transform(data[data.columns, -"cases"])
-# print(X_train)
-# print(X_test)
+X_train, Y_train, X_validation, Y_validation, X_test, Y_test = get_data()
 
 # get number of columns in training data
 validation_split_rate = 0.2
@@ -98,62 +52,91 @@ def build_model(hp):
     model = Sequential()
     model.add(InputLayer(input_shape=(n_cols,)))
 
-    for i in range(hp.Int('num_layers', 2, 20)):
-        model.add(Dense(units=hp.Int('units_' + str(i), min_value=16,
-                                     max_value=512, step=16),
+    num_units_per_layer = hp.Int('units_per_hidden_layer', min_value=32,
+                                 max_value=4096, step=32)
+    dropout_rate_per_layer = hp.Float('dropout_per_hidden_layer', min_value=0.0,
+                                      max_value=0.9, step=0.1)
+
+    for i in range(hp.Int('num_layers', 2, 2)):
+        model.add(Dense(units=num_units_per_layer,
                         activation='relu',
-                        kernel_initializer='he_normal',
+                        kernel_initializer='he_uniform',
                         bias_initializer='zeros'))
-        model.add(Dropout(rate=hp.Float('dropout_' + str(i), min_value=0.0,
-                                        max_value=0.99, step=0.2)))
+        model.add(BatchNormalization())
+        model.add(Dropout(rate=dropout_rate_per_layer))
 
     model.add(Dense(1, activation='linear',
-                    kernel_initializer='he_normal',
+                    kernel_initializer='he_uniform',
                     bias_initializer='zeros'))
-    model.compile(optimizer=Adam(hp.Choice('learning_rate', values=[
-                  1e-2, 1e-3, 1e-4, 1e-5])), loss='mean_squared_error', metrics=['mse'])
+    model.compile(optimizer=Adam(hp.Choice('learning_rate',
+                                           values=[0.005, 0.001, 0.0005, 0.0001, 0.00005, 0.00001])),
+                  loss='mean_squared_error',
+                  metrics=[metrics.RootMeanSquaredError(), metrics.MeanAbsoluteError(), metrics.MeanAbsolutePercentageError(), metrics.MeanSquaredLogarithmicError()])
     return model
 
+
+max_trial = 7000
 
 tuner = RandomSearch(
     build_model,
     seed=0,
-    objective='val_mse',
-    max_trials=100,
-    executions_per_trial=3,
+    objective='val_loss',
+    max_trials=max_trial,
+    executions_per_trial=1,
     directory='random-search',
     project_name='covid-19-nn')
 
-tuner.search_space_summary()
+if TRAINING:
+    tuner.search_space_summary()
+    # early_stopping_monitor = EarlyStopping(
+    #     patience=200, baseline=0.5)
+    # Use .values to convert pandas dataframe to numpy array
+    # To avoid the Warning -> WARNING:tensorflow:Falling back from v2 loop because of error: Failed to find data adapter that can handle input: <class 'pandas.core.frame.DataFrame'>, <class 'NoneType'>
+    tuner.search(X_train.values, Y_train.values,
+                 epochs=1000,
+                 batch_size=train_total,
+                 validation_data=(X_validation.values, Y_validation.values),
+                 callbacks=[])
 
-tuner.search(X_train, Y_train,
-             epochs=1000,
-             batch_size=train_total,
-             validation_data=(X_val, Y_val),
-             callbacks=[tensorboard])
+if CLEAN:
+    # all other trial_ids than top 3
+    trial_ids_to_remove = [best_trial.trial_id for best_trial in tuner.oracle.get_best_trials(
+        num_trials=max_trial)[3:]]
+
+    for trial_id in trial_ids_to_remove:
+        rsPath = "random-search/covid-19-nn/trial_{}".format(trial_id)
+        logsPath = "logs/{}".format(trial_id)
+        if os.path.isdir(rsPath):
+            rmtree(rsPath)
+        if os.path.isdir(logsPath):
+            rmtree(logsPath)
 
 print("######## GET BEST MODELS ########")
 models = tuner.get_best_models()
-best_hyperparameters = tuner.get_best_hyperparameters(1)[0]
+evaluation = models[0].evaluate(X_test.values, Y_test.values)
 print(models[0].summary())
-print(models[0].evaluate(X_test, Y_test))
+print(evaluation)
+print("Mean Squared Error", evaluation[1])
 
-def custom_r2(mse, Y):
-    n = len(Y)
-    ss_res = n*mse
-    ss_tot = np.sum(np.square(Y - np.mean(Y)))
-    return 1 - (ss_res/ss_tot)
+print(tuner.results_summary(1))
 
-
-def custom_adj_r2(mse, Y, p):
-    n = len(Y)
-    standard_term = (n - 1) / (n - p - 1)
-    r2 = custom_r2(mse, Y)
-    return 1 - (1 - r2) * standard_term
-
-
-print(custom_r2(0.07716933637857437, Y_test["adj_cases"].to_numpy()))
-print(custom_adj_r2(0.07716933637857437, Y_test["adj_cases"].to_numpy(), 16))
+print("R2:", custom_r2(evaluation[0], Y_test.to_numpy()))
+print("Adj. R2:", custom_adj_r2(evaluation[0], Y_test.to_numpy(), 16))
 
 print("######## SUMMARY ########")
-# tuner.results_summary(3)
+print("Overall Runtime:", datetime.now() - begin)
+
+if not TRAINING and not CLEAN:
+    plot_predicted_vs_true(Xs=[X_train, X_validation, X_test],
+                           Ys=[Y_train, Y_validation, Y_test],
+                           model=models[0])
+# # Save the best model
+# models[0].save("./best-models/two-hidden-layers")
+
+
+# # Instantiate a model with the best hyperparameters -> makes the model retrainable
+# best_hp = tuner.get_best_hyperparameters()[0]
+# mode_of_best_hp = tuner.hypermodel.build(best_hp)
+# print(mode_of_best_hp.evaluate(X_test, Y_test))
+# mode_of_best_hp.fit(X_train, Y_train, batch_size=train_total, validation_data=(X_validation, Y_validation),
+#           epochs=1000, verbose=1, callbacks=[])
