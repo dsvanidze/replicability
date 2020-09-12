@@ -426,5 +426,6 @@
         }
       ]
     }
-  }
+},
+"python.languageServer": "Microsoft"
 }

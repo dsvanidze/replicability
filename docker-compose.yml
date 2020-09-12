@@ -1,0 +1,16 @@
+version: "3.7"
+
+services:
+  bachelor:
+    # image: covid-19-ml
+    build: .
+    ports:
+      - 9008:9008 # user for local jupyter
+      - 9009:9009 # user for ssh jupyter
+    working_dir: /all
+    volumes:
+      - .:/all
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    stdin_open: true # docker run -i
+    tty: true # docker run -t

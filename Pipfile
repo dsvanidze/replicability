@@ -21,6 +21,7 @@ keras-tuner = "*"
 shapely = "*"
 descartes = "*"
 mapclassify = "*"
+seaborn = "*"
 
 [requires]
 python_version = "3.7"
