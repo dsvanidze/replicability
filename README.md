@@ -1,3 +1,3 @@
-# Spatio-Temporal Deep-Learning Model For Coronavirus Cases
+# Fine-Scale Spatial Predictions of COVID-19 Cases in China using GIS Data and Deep Learning Algorithms
 
-This Deep Learning model will be able to predict number of coronavirus cases in China through Spatio-Temporal Data. 
+![COMING SOON](https://media2.giphy.com/media/xT9KVmZwJl7fnigeAg/giphy.gif)
