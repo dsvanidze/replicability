@@ -1,10 +1,5 @@
 {
-  "python.pythonPath": ".venv/bin/python",
   "python.jediEnabled": false,
-  "python.envFile": "${workspaceFolder}/.vscode/vscode.env",
-  "terminal.integrated.env.osx": {
-    "PYTHONPATH": "${workspaceRoot}/model"
-  },
   "python.linting.enabled": true,
   "C_Cpp.enhancedColorization": "Enabled",
   "workbench.colorTheme": "Chromodynamics",
