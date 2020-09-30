@@ -24,7 +24,8 @@ You can navigate to the folder with your command-line tool with the command `cd 
 
 <br>
 
-After you  navigate to  the folder you can build and run the Docker container with the command `docker-compose up -d --build` (without --build if you ran it already). You can then use the command-line in your Docker container to have access to all installed tools and project requirements internally. For this, use the command `docker-compose exec bachelor bash`.
+After you  navigate to  the folder you can build and run the Docker container with the command 
+`docker-compose up -d --build` or `docker-compose up -d` if you ran it already. You can then use the command-line in your Docker container to have access to all installed tools and project requirements internally. For this, use the command `docker-compose exec bachelor bash`. To disconnet the Docker container use `docker-compose down`.
 
 <br>
 
