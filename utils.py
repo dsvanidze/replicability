@@ -14,16 +14,16 @@ def get_data():
     }
 
     for key in data:
-        data[key]["longitude"] = data[key]["longitude"] / 180
-        data[key]["latitude"] = data[key]["latitude"] / 90
-        data[key]["adj_cases"] = np.log(data[key]["adj_cases"] + 1)
+        data[key]["LONG"] = data[key]["LONG"] / 180
+        data[key]["LAT"] = data[key]["LAT"] / 90
+        data[key]["IR"] = np.log(data[key]["IR"] + 1)
 
-    X_train = data["train"].drop("adj_cases", axis=1)
-    Y_train = data["train"][["adj_cases"]]
-    X_validation = data["validation"].drop("adj_cases", axis=1)
-    Y_validation = data["validation"][["adj_cases"]]
-    X_test = data["test"].drop("adj_cases", axis=1)
-    Y_test = data["test"][["adj_cases"]]
+    X_train = data["train"].drop("IR", axis=1)
+    Y_train = data["train"][["IR"]]
+    X_validation = data["validation"].drop("IR", axis=1)
+    Y_validation = data["validation"][["IR"]]
+    X_test = data["test"].drop("IR", axis=1)
+    Y_test = data["test"][["IR"]]
 
     return X_train, Y_train, X_validation, Y_validation, X_test, Y_test
 
