@@ -1,5 +1,7 @@
 FROM conda/miniconda3
 WORKDIR /all
+COPY setup.py ./
+COPY src/ ./src/
 COPY environment.yml ./
 SHELL ["/bin/bash", "-c"]
 ENV BASH_ENV ~/.bashrc
