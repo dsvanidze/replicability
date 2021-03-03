@@ -2,8 +2,10 @@
 **
 
 # allow only environment.yml.
-# Only this file is used in Dockerfile to build image
+# Only these files are used in Dockerfile to build image
 !environment.yml
+!setup.py
+!src/**
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

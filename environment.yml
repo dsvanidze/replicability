@@ -19,4 +19,7 @@ dependencies:
   - xarray
   - xgboost
   - descartes
+  - pip
+  - pip:
+    - '--editable=.'
 prefix: /usr/local/envs/bachelor
