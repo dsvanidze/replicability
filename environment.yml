@@ -1,4 +1,4 @@
-name: bachelor
+name: replicability
 channels:
   - conda-forge
   - defaults
@@ -19,7 +19,7 @@ dependencies:
   - xarray
   - xgboost
   - descartes
-  - pip
+  - pip=20.2
   - pip:
-    - '--editable=.'
-prefix: /usr/local/envs/bachelor
+      - '--editable=.'
+prefix: /usr/local/envs/replicability
