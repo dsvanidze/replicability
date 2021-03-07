@@ -22,7 +22,7 @@ def read(*names, **kwargs):
 
 
 setup(
-    name='bachelor',
+    name='replicability',
     version='0.1.0',
     license='MIT license',
     description='Towards Replicability',
