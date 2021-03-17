@@ -421,6 +421,7 @@
         }
       ]
     }
-},
-"python.languageServer": "Microsoft"
+  },
+  "python.languageServer": "Pylance",
+  "diffEditor.wordWrap": "off"
 }
