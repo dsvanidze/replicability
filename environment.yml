@@ -4,16 +4,16 @@ channels:
   - defaults
 dependencies:
   - python=3.7
+  - tensorflow
+  - nodejs
+  - git
   - pandas
-  - keras
-  - notebook
   - rasterio
   - matplotlib
   - jupyterlab
   - nomkl
   - scikit-learn
   - seaborn
-  - tensorflow
   - geopandas
   - keras-tuner
   - xarray
@@ -21,5 +21,5 @@ dependencies:
   - descartes
   - pip=20.2
   - pip:
-      - '--editable=.'
+      - "--editable=."
 prefix: /usr/local/envs/replicability
