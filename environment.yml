@@ -17,7 +17,6 @@ dependencies:
   - geopandas
   - keras-tuner
   - xarray
-  - xgboost
   - descartes
   - pip=20.2
   - pip:
