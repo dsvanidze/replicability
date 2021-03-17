@@ -1,16 +1,21 @@
 version: "3.7"
 
 services:
-  bachelor:
-    # image: covid-19-ml
-    build: .
+  replicability:
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+    image: replicability
     ports:
-      - 9008:9008 # user for local jupyter
-      - 9009:9009 # user for ssh jupyter
+      - 9008:9008 # user for ssh jupyter
+      - 9009:9009 # user for local jupyter
     working_dir: /all
+    command: bash -c "jupyter lab --no-browser --ip=0.0.0.0 --port=9009 --allow-root"
+    # command: bash -c "jupyter lab --no-browser --ip=0.0.0.0 --port=9009 --allow-root --NotebookApp.token='' --NotebookApp.password=''"
     volumes:
       - .:/all
     environment:
+      - SHELL=/bin/bash # Default Shell, important for jupyter shell too
       - JUPYTER_ENABLE_LAB=yes
     stdin_open: true # docker run -i
     tty: true # docker run -t

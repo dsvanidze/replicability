@@ -1,22 +1,24 @@
-name: bachelor
+name: replicability
 channels:
   - conda-forge
   - defaults
 dependencies:
   - python=3.7
+  - tensorflow
+  - nodejs
+  - git
   - pandas
-  - keras
-  - notebook
   - rasterio
   - matplotlib
   - jupyterlab
   - nomkl
   - scikit-learn
   - seaborn
-  - tensorflow
   - geopandas
   - keras-tuner
   - xarray
-  - xgboost
   - descartes
-prefix: /usr/local/envs/bachelor
+  - pip=20.2
+  - pip:
+      - "--editable=."
+prefix: /usr/local/envs/replicability
