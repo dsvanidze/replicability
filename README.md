@@ -1,36 +1,46 @@
-# Fine-Scale Spatial Predictions of COVID-19 Cases in China using GIS Data and Deep Learning Algorithms
+# Towards Replicability and Reproductibility in Geography: A General Framework for Predictive Modeling on Spatial Data
 
-This repository provides source code and replication guide of the study in PDF.
+This repository provides source code, replication framework and guide of a forthcoming paper.
 
 
 ## Reproduction steps
 
-### Step 1: Download project
-To easily get the project files locally, you can install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and use the clone command `git clone https://github.com/dsvanidze/fine-scale-spatial-predictions-of-covid-19-cases-in-china-using-gis-data-and-deep-learning.git` in your command-line tool or just follow the [Github guide for downloading files](https://docs.github.com/en/enterprise/2.13/user/articles/cloning-a-repository).
+### Step 1: Requirements
+To easily get the project files locally, you can download the project .ZIP locally from [here](https://github.com/dsvanidze/replicability/archive/refs/heads/master.zip) and extract it. Alternatively, if you already use git, follow the [Github guide for downloading files](https://docs.github.com/en/enterprise/2.13/user/articles/cloning-a-repository).
 
 <br>
 
-### Step 2: Install Docker and Docker Compose
-Official Docker documentation explains how to install [Docker](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/) for different operating systems (Mac, Windows, Linux).
+In addition, official Docker documentation explains how to install [Docker](https://docs.docker.com/get-docker/) for different operating systems (Mac, Windows, Linux).
+
 
 <br>
 
-### Step 3: Execute the code locally
-After following the steps before, you will have a project folder locally with the name *fine-scale-spatial-predictions-of-covid-19-cases-in-china-using-gis-data-and-deep-learning*. 
+### Step 2: Build Docker container
+After following the steps before, you will have a project folder locally with the name *replicability-master* (or *replicability* if used git). Get an absolute path to the folder and navigate to it within command line:
 
-<br>
- 
-You can navigate to the folder with your command-line tool with the command `cd <PATH_TO_THE_FOLDER>/fine-scale-spatial-predictions-of-covid-19-cases-in-china-using-gis-data-and-deep-learning` where <PATH_TO_THE_FOLDER> would be the absolute path to the folder.
-
-<br>
-
-After you  navigate to  the folder you can build and run the Docker container with the command 
-`docker-compose up -d --build` or `docker-compose up -d` if you ran it already. You can then use the command-line in your Docker container to have access to all installed tools and project requirements internally. For this, use the command `docker-compose exec bachelor bash`. To disconnet the Docker container use `docker-compose down`.
+`cd absolute_path_to_folder`
 
 <br>
 
-Finally, if you want to run Jupyter notebooks, you can run `jpt start 9008` in the command-line tool of the Docker container . This will start a Jupyter notebook on the port 9008. After starting Jupyter Notebook, it will log a link in the command-line tool like [http://127.0.0.1:9009/?token=917d4ee70903755d534ef613ff9eac9113d079985a383113](http://127.0.0.1:9009/?token=917d4ee70903755d534ef613ff9eac9113d079985a383113). You can copy the link in your browser and access the Jupyter notebook running in the Docker container.
+After you  navigate to  the folder you can build the project Docker container, which will take several minutes to automatically install all project requirements:
+
+`docker-compose build`
 
 <br>
 
-This is all. Now you have the exact same code, with the exact same tools and requirements as I used for the project development. You did not need to install Python, Conda or other dependencies for the project.
+### Step 3: Work with project
+To run Docker container and work with the project, you will only need to run:
+
+`docker-compose up`
+
+<br>
+
+Now you can interact with the project by copying Jupyter notebook link into your browser, which looks like this in the command-line output:
+
+[http://127.0.0.1:9009/?token=917d4ee70903755d534ef613ff9eac9113d079985a383113](http://127.0.0.1:9009/?token=917d4ee70903755d534ef613ff9eac9113d079985a383113)
+
+<br>
+
+### Conclusion
+
+This is all. Now you have the exact same code, with the exact same tools and requirements as we, collaborators, use for the project development. You do not need to install Python, Conda or other dependencies for the project, it is already done for you automatically.
