@@ -12,9 +12,6 @@ To easily get the project files locally, you can download the project .ZIP local
 
 In addition, official Docker documentation explains how to install [Docker](https://docs.docker.com/get-docker/) for different operating systems (Mac, Windows, Linux).
 
-
-<br>
-
 ### Step 2: Build Docker container
 After following the steps before, you will have a project folder locally with the name *replicability-master* (or *replicability* if used git). Get an absolute path to the folder and navigate to it within command line:
 
@@ -26,8 +23,6 @@ After you  navigate to  the folder you can build the project Docker container, w
 
 `docker-compose build`
 
-<br>
-
 ### Step 3: Work with project
 To run Docker container and work with the project, you will only need to run:
 
@@ -38,8 +33,6 @@ To run Docker container and work with the project, you will only need to run:
 Now you can interact with the project by copying Jupyter notebook link into your browser, which looks like this in the command-line output:
 
 [http://127.0.0.1:9009/?token=917d4ee70903755d534ef613ff9eac9113d079985a383113](http://127.0.0.1:9009/?token=917d4ee70903755d534ef613ff9eac9113d079985a383113)
-
-<br>
 
 ### Conclusion
 
