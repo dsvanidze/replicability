@@ -423,5 +423,6 @@
     }
   },
   "python.languageServer": "Pylance",
-  "diffEditor.wordWrap": "off"
+  "diffEditor.wordWrap": "off",
+  "python.formatting.provider": "autopep8"
 }
