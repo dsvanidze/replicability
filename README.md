@@ -1,4 +1,4 @@
-# Towards Replicability and Reproductibility in Geography: A General Framework for Predictive Modeling on Spatial Data
+## Towards Replicability and Reproductibility in Geography: A General Framework for Predictive Modeling on Spatial Data
 
 This repository provides source code, replication framework and guide of a forthcoming paper.
 
