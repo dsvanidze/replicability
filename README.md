@@ -18,9 +18,6 @@ In case:
 * your OS is Windows and Docker asks you for WSL2 Linux Kernel, you can download and run the installation file [Windows Linux Kernel](https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi). If you have an ARM64 machine, you are required to download and run the installation file [ARM64 Package](https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_arm64.msi). If you are not sure, which type of machine you have, type in command line `systeminfo | find "System Type"`. Installation of WSL2 is very fast and can take only a few seconds. After this you need to follow Docker instructions and restart your machine.
 * your machine is Windows and you installed Windows Linux Kernel from the previous step and Docker software start takes 3+ Minutes. Fix it by running `wsl --unregister docker-desktop` and `wsl --unregister docker-desktop-data` in command line (source: [Stackoverflow](https://stackoverflow.com/a/62495664/6072503)).
 
-
-In addition, official Docker documentation explains how to install [Docker](https://docs.docker.com/get-docker/) for different operating systems (Mac, Windows, Linux).
-
 ### Step 2: Build Docker container
 After following the steps before, you will have a project folder locally with the name *replicability-master* (or *replicability* if used git). To get the absolute path and navigate to the folder:
 1. Open command line by searching for Terminal on MacOS/Linux and cmd on Windows machines
