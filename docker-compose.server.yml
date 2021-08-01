@@ -2,6 +2,8 @@ version: "3.7"
 
 services:
   replicability:
+    environment:
+        - JUPYTER_CONFIG_DIR="/all/.jupyter"
     build:
       dockerfile: ./Dockerfile
       context: ./
@@ -9,7 +11,7 @@ services:
     ports:
       - 9009:9009
     working_dir: /all
-    command: bash -c "jupyter lab --no-browser --ip=0.0.0.0 --port=9009 --allow-root"
+    command: bash -c "JUPYTER_CONFIG_DIR=/all/.jupyter jupyter lab --no-browser --ip=0.0.0.0 --port=9009 --allow-root --NotebookApp.token='7cf55c2887d81e8ea8da627112d0753e4b4fc79345f121fc'"
     volumes:
       - .:/all
     environment:
