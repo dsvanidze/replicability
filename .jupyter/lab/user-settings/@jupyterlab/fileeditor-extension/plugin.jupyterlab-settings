@@ -1,6 +1,6 @@
 {
     "editorConfig": {
-         "readOnly": false // to make all editor editable
-         // "readOnly": true // to make all editor read-only
+         // "readOnly": false // to make all editor editable
+         "readOnly": true // to make all editor read-only
     }
 }
