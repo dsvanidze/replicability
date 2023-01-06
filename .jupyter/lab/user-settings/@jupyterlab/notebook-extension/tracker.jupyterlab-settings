@@ -1,7 +1,12 @@
 {
     "codeCellConfig": {
         "lineNumbers": true,
-        // "readOnly": false // to make all cells editable
-        "readOnly": true // to make all cells read-only
+        "readOnly": true
+    },
+    "markdownCellConfig": {
+        "readOnly": true
+    },
+    "rawCellConfig": {
+        "readOnly": true
     }
 }
