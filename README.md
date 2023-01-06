@@ -1,4 +1,5 @@
-## Towards Replicability and Reproductibility in Geography: A General Framework for Predictive Modeling on Spatial Data
+## Making deep learning algorithms reproducible: the devil is in the details
+### A case study on predicting early COVID-19 infections in China
 
 This repository provides source code, replication framework and guide of a forthcoming paper. You can view the [project online](http://c100-159.cloud.gwdg.de:9009/lab/tree/notebooks/main.ipynb?token=7cf55c2887d81e8ea8da627112d0753e4b4fc79345f121fc) (read-only) or reproduce it locally (editable).
 
